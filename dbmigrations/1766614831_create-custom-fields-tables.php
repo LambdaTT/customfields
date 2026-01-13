@@ -20,8 +20,8 @@ class CreateCustomFieldsTables extends Migration
 
     $this->Table('CST_CUSTOMFIELD_VALUE', 'Valor do Campo Customizado')
       ->id('id_cst_customfield_value') // int primary key auto increment
-      ->int('id_cst_customfield')
-      ->int('id_reference_entity')
+      ->fk('id_cst_customfield')
+      ->fk('id_reference_entity')
       ->text('tx_value')
       ->Foreign('id_cst_customfield')
       ->references('id_cst_customfield')
