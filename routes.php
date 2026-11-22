@@ -5,9 +5,15 @@ namespace Settings\Routes;
 use SplitPHP\Request;
 use SplitPHP\WebService;
 use SplitPHP\Exceptions\Unauthorized;
+use SplitPHP\ModsManager;
 
 class Settings extends WebService
 {
+  private const CUSTOMFIELD_PERMISSIONS = [
+    'read'    => 'customfields.customfield.read',
+    'manage'  => 'customfields.customfield.manage'
+  ];
+
   public function init()
   {
     $this->setAntiXsrfValidation(false);
@@ -24,9 +30,7 @@ class Settings extends WebService
     });
 
     $this->addEndpoint('POST', "/v1/field", function (Request $request) {
-      $this->auth([
-        'STT_SETTINGS_CUSTOMFIELD' => 'C'
-      ]);
+      $this->auth(self::CUSTOMFIELD_PERMISSIONS['manage']);
 
       $data = $request->getBody();
       return $this->response
@@ -35,9 +39,7 @@ class Settings extends WebService
     }, true);
 
     $this->addEndpoint('DELETE', "/v1/field/?entityName?/?fieldName?", function (Request $request) {
-      $this->auth([
-        'STT_SETTINGS_CUSTOMFIELD' => 'D'
-      ]);
+      $this->auth(self::CUSTOMFIELD_PERMISSIONS['manage']);
 
       $entityName = $request->getRoute()->params['entityName'];
       $fieldName = $request->getRoute()->params['fieldName'];
@@ -51,17 +53,15 @@ class Settings extends WebService
     }, true);
   }
 
-  private function auth(array $permissions = [])
+  private function auth(array|string $permissions)
   {
-    if (!$this->getService('modcontrol/control')->moduleExists('iam')) return;
+    if (!ModsManager::modExists('iam')) return;
 
     // Auth user login:
     if (!$this->getService('iam/session')->authenticate())
       throw new Unauthorized("Não autorizado.");
 
     // Validate user permissions:
-    if (!empty($permissions))
-      $this->getService('iam/permission')
-        ->validatePermissions($permissions);
+    $this->getService('iam/permission')->requireAny($permissions);
   }
 }
