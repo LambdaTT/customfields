@@ -1,0 +1,42 @@
+🧩 LambdaTT Custom Fields - Release Notes
+---
+
+📦 Version: 0.1.2
+📅 Release Date: 2026-11-22
+📄 License: MIT
+👤 Authors:
+  - Gabriel Valentoni Guelfi (https://github.com/gabriel-guelfi)
+
+---
+
+💬 Commentaries:
+
+Aligns this module with the IAM permissions-domain simplification (IAM v1.3.0) by adopting the
+tag-based permissioning standard.
+
+---
+
+✨ Added:
+
+    ▸ Seed `dbseeds/1795316470_customfields-permissions.php`, registering the module's permission
+      tags in `IAM_PERMISSION`: `customfields.customfield.read` and
+      `customfields.customfield.manage`.
+
+---
+
+🔧 Changed:
+
+    ▸ Replaced the entity/CRUD permission codes (`STT_SETTINGS_CUSTOMFIELD` C/D) with tag-based
+      permissions enforced via `iam/permission->requireAny()`. Creating and deleting a field now
+      require `customfields.customfield.manage`.
+
+    ▸ Module presence is now checked via `ModsManager::modExists('iam')`.
+
+---
+
+🔧 Fixed:
+
+    ▸ Removed the call to `iam/permission->validatePermissions()`, a method dropped in the IAM
+      refactor that would otherwise throw an "undefined method" fatal on every guarded endpoint.
+
+---
